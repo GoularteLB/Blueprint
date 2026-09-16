@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}?reWriteBatchedInserts=true
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      JAVA_OPTS: "-Xmx${JVM_MAX_HEAP} -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/data/heapdump.hprof"
+      APP_INGESTION_BATCH_SIZE: ${BATCH_SIZE}
+      APP_INGESTION_COMMIT_EVERY_N_BATCHES: ${COMMIT_EVERY_N_BATCHES}
+      APP_INGESTION_SYNCHRONOUS_COMMIT: ${SYNCHRONOUS_COMMIT}
+      APP_INGESTION_UPLOAD_DIR: /data/uploads
+    volumes:
+      - uploads:/data/uploads
+    mem_limit: ${BACKEND_MEM_LIMIT}
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
+  uploads:
