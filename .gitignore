@@ -9,6 +9,8 @@ build/
 .mvn/wrapper/maven-wrapper.jar
 
 .idea/
+.idea_backup_broken/
+out/
 *.iml
 *.ipr
 *.iws
