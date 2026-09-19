@@ -7,6 +7,9 @@ spring:
       max-request-size: 1GB
       file-size-threshold: 0
   datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/ingestion?reWriteBatchedInserts=true}
+    username: ${SPRING_DATASOURCE_USERNAME:ingestion}
+    password: ${SPRING_DATASOURCE_PASSWORD:ingestion}
     hikari:
       maximum-pool-size: 6
   flyway:
@@ -17,7 +20,7 @@ app:
     batch-size: ${APP_INGESTION_BATCH_SIZE:5000}
     commit-every-n-batches: ${APP_INGESTION_COMMIT_EVERY_N_BATCHES:2}
     synchronous-commit: ${APP_INGESTION_SYNCHRONOUS_COMMIT:false}
-    upload-dir: ${APP_INGESTION_UPLOAD_DIR:/data/uploads}
+    upload-dir: ${APP_INGESTION_UPLOAD_DIR:./data/uploads}
     max-error-samples: 20
     max-error-raw-length: 500
     executor:
