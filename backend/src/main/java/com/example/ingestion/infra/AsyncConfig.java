@@ -19,7 +19,6 @@ public class AsyncConfig {
         executor.setQueueCapacity(props.executor().queueCapacity());
         executor.setThreadNamePrefix("ingest-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
-        executor.initialize();
         return executor;
     }
 

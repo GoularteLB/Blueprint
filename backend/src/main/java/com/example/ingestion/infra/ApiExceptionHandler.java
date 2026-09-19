@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
@@ -25,6 +26,11 @@ public class ApiExceptionHandler {
     @ExceptionHandler(DateTimeParseException.class)
     public ProblemDetail handleDateTimeParse(DateTimeParseException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "invalid date/time: " + e.getMessage());
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public ProblemDetail handleMultipart(MultipartException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "request must be multipart/form-data with a 'file' part");
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

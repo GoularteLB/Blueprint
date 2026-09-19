@@ -4,6 +4,7 @@ import com.example.ingestion.imports.model.ParsedRow;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Component;
 
@@ -42,7 +43,7 @@ public class CsvRowParser {
         String description = optional(record, "description");
         String source = optional(record, "source");
 
-        return new ParsedRow(externalId, occurredAt.toInstant(), category.toUpperCase(), description, amount, source);
+        return new ParsedRow(externalId, occurredAt.toInstant(), category.toUpperCase(Locale.ROOT), description, amount, source);
     }
 
     private String required(CSVRecord record, String name) {
