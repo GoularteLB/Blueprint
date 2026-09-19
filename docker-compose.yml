@@ -2,13 +2,13 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-ingestion}
+      POSTGRES_USER: ${POSTGRES_USER:-ingestion}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ingestion}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ingestion} -d ${POSTGRES_DB:-ingestion}"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -21,17 +21,17 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}?reWriteBatchedInserts=true
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-      JAVA_OPTS: "-Xmx${JVM_MAX_HEAP} -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/data/heapdump.hprof"
-      APP_INGESTION_BATCH_SIZE: ${BATCH_SIZE}
-      APP_INGESTION_COMMIT_EVERY_N_BATCHES: ${COMMIT_EVERY_N_BATCHES}
-      APP_INGESTION_SYNCHRONOUS_COMMIT: ${SYNCHRONOUS_COMMIT}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-ingestion}?reWriteBatchedInserts=true
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-ingestion}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-ingestion}
+      JAVA_OPTS: "-Xmx${JVM_MAX_HEAP:-512m} -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/data/heapdump.hprof"
+      APP_INGESTION_BATCH_SIZE: ${BATCH_SIZE:-1000}
+      APP_INGESTION_COMMIT_EVERY_N_BATCHES: ${COMMIT_EVERY_N_BATCHES:-10}
+      APP_INGESTION_SYNCHRONOUS_COMMIT: ${SYNCHRONOUS_COMMIT:-true}
       APP_INGESTION_UPLOAD_DIR: /data/uploads
     volumes:
       - uploads:/data/uploads
-    mem_limit: ${BACKEND_MEM_LIMIT}
+    mem_limit: ${BACKEND_MEM_LIMIT:-768m}
     ports:
       - "8080:8080"
 
