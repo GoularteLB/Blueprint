@@ -8,7 +8,6 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -72,7 +71,7 @@ public class AnalyticsRepository {
 
     public List<MonthlyPoint> monthlyDirect(Instant from, Instant to, UUID jobId) {
         StringBuilder sql = new StringBuilder(
-                "SELECT date_trunc('month', occurred_at) AS month, SUM(amount) AS total_amount, COUNT(*) AS tx_count " +
+                "SELECT CAST(date_trunc('month', occurred_at AT TIME ZONE 'UTC') AS date) AS month, SUM(amount) AS total_amount, COUNT(*) AS tx_count " +
                 "FROM transactions WHERE occurred_at >= ? AND occurred_at < ?");
         List<Object> args = new ArrayList<>(List.of(Timestamp.from(from), Timestamp.from(to)));
         if (jobId != null) {
@@ -81,7 +80,7 @@ public class AnalyticsRepository {
         }
         sql.append(" GROUP BY 1 ORDER BY 1");
         return jdbc.query(sql.toString(), (rs, rn) -> new MonthlyPoint(
-                rs.getTimestamp("month").toInstant().atZone(ZoneOffset.UTC).toLocalDate(),
+                rs.getDate("month").toLocalDate(),
                 rs.getBigDecimal("total_amount"), rs.getLong("tx_count")
         ), args.toArray());
     }

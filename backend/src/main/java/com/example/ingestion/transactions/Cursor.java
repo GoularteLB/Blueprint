@@ -14,6 +14,9 @@ public record Cursor(Instant ts, long id) {
     public static Cursor decode(String value) {
         String raw = new String(Base64.getUrlDecoder().decode(value), StandardCharsets.UTF_8);
         int sep = raw.lastIndexOf('|');
+        if (sep < 0) {
+            throw new IllegalArgumentException("invalid cursor");
+        }
         Instant ts = Instant.parse(raw.substring(0, sep));
         long id = Long.parseLong(raw.substring(sep + 1));
         return new Cursor(ts, id);

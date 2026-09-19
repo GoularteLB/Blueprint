@@ -4,6 +4,7 @@ import com.example.ingestion.analytics.model.CategoryPoint;
 import com.example.ingestion.analytics.model.MonthlyPoint;
 import com.example.ingestion.analytics.model.OverviewResult;
 import com.example.ingestion.analytics.model.Source;
+import com.example.ingestion.infra.DateParams;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
@@ -53,8 +54,8 @@ public class AnalyticsController {
                                               @RequestParam String from,
                                               @RequestParam String to,
                                               @RequestParam(required = false) UUID jobId) {
-        Instant fromInstant = Instant.parse(from);
-        Instant toInstant = Instant.parse(to);
+        Instant fromInstant = DateParams.parse(from);
+        Instant toInstant = DateParams.parse(to);
         Source resolved = resolveSource(source, fromInstant, toInstant);
         List<MonthlyPoint> points = resolved == Source.SUMMARY
                 ? repository.monthlySummary(toUtcDate(fromInstant), toUtcDate(toInstant), jobId)
@@ -72,8 +73,8 @@ public class AnalyticsController {
                                                  @RequestParam String from,
                                                  @RequestParam String to,
                                                  @RequestParam(required = false) UUID jobId) {
-        Instant fromInstant = Instant.parse(from);
-        Instant toInstant = Instant.parse(to);
+        Instant fromInstant = DateParams.parse(from);
+        Instant toInstant = DateParams.parse(to);
         Source resolved = resolveSource(source, fromInstant, toInstant);
         List<CategoryPoint> points = resolved == Source.SUMMARY
                 ? repository.categoriesSummary(toUtcDate(fromInstant), toUtcDate(toInstant), jobId)
